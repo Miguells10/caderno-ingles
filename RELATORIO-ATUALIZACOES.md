@@ -57,20 +57,25 @@ O banco instalado fica em `%APPDATA%\Caderno Ingles\dados\caderno.sqlite`. O ins
 
 - Conferir visualmente as telas novas em janela estreita e larga. As regras responsivas foram adicionadas, mas o controle da janela não permitiu completar essa inspeção manual.
 - Exercitar o fluxo completo pela interface instalada e testar uma sessão MCP conectada ao executável instalado. Compilação e testes de domínio não substituem essas verificações.
-- Depois do primeiro envio ao GitHub, conferir o resultado real da checagem automática. A existência do arquivo de workflow não prova uma execução bem-sucedida.
 
 ## GitHub e privacidade
 
 O repositório deve ser **privado** porque o código de dados iniciais contém contexto pessoal de estudo e trabalho. `.gitignore` exclui dependências, builds, executáveis, dados locais, backups e arquivos temporários. O workflow `.github/workflows/verify.yml` está preparado para rodar `npm ci`, `npm test` e `npm run build` a cada envio ou pull request. Ele não publica nem instala uma nova versão.
 
-Em 28/10/2026, o Git local foi iniciado na branch `main` e `origin` aponta para `https://github.com/Miguells10/caderno-ingles.git`. **O repositório remoto ainda não existe e nenhum commit foi enviado.** A conexão do GitHub no Codex permitiu confirmar a conta `Miguells10`, mas não oferece criação de repositório. O `gh` instalado está com autenticação inválida e a página de criação pediu login; o GitHub Desktop não aceitou controle remoto da janela nesta sessão. Por isso, a criação privada e o primeiro envio precisam ser concluídos na conta do usuário.
+Em 28/10/2026, o repositório privado `Miguells10/caderno-ingles` foi criado e a branch `main` foi enviada. O workflow **Verificar Caderno** passou na primeira execução. O GitHub CLI está autenticado neste computador.
 
-Para fazer o primeiro envio: entrar no GitHub como `Miguells10`, criar um repositório **privado** chamado `caderno-ingles` sem arquivos iniciais, revisar os arquivos locais, criar o primeiro commit e enviar a branch `main` ao `origin`. Depois, abrir a aba **Actions** e confirmar a primeira execução de `Verificar Caderno`.
-
-Para revisar uma atualização futura no GitHub: criar uma branch, enviar os commits, abrir um pull request, conferir o diff e o status do workflow, e só então integrar na branch principal. O instalador local continua exigindo `npm run package:win` e instalação explícita.
+Para revisar uma atualização futura no GitHub: criar uma branch, enviar os commits, abrir um pull request, conferir o diff e o status do workflow, e só então integrar na branch principal. Para publicar, atualizar a versão e enviar uma tag correspondente; o workflow gera os arquivos de atualização.
 
 ## Adendo — atualização 1.3.0 (28/10/2026)
 
 O app ganhou verificação de atualizações ao abrir e opção manual em Ajustes. Quando há uma versão nova, mostra o aviso, baixa sob demanda e aplica após reiniciar. Usa electron-updater com o instalador NSIS e lê a autenticação do GitHub CLI da máquina para consultar o repositório privado; o token não é enviado à interface. O workflow de release publica o instalador e latest.yml quando uma tag v<versão> for enviada.
 
-Verificação local: 22 testes passaram, o build passou e o instalador release/Caderno-Ingles-Setup-1.3.0.exe foi gerado com latest.yml e app-update.yml. Ainda não houve instalação da 1.3.0 nem teste de atualização entre duas versões publicadas. O repositório GitHub remoto e o login do gh continuam pendentes; a branch local ainda não tinha commit no momento desta nota.
+Verificação local: 22 testes passaram, o build passou e o instalador release/Caderno-Ingles-Setup-1.3.0.exe foi gerado com latest.yml e app-update.yml. A versão 1.3.0 foi instalada, com integridade e quantidade de registros preservadas. A primeira publicação criou releases separados, o que impediu o app de encontrar o manifesto; isso motivou a correção da 1.3.1.
+
+## Adendo — atualização 1.3.1 (28/10/2026)
+
+O app passou a selecionar explicitamente o provedor privado depois de obter a credencial. O workflow passou a gerar os arquivos localmente e enviá-los juntos em um único release. A publicação 1.3.1 passou, com instalador, blockmap e latest.yml no mesmo release. A versão 1.3.1 foi instalada e consultou o repositório privado com sucesso, mostrando “O Caderno está atualizado”. O banco local retornou `integrity_check=ok`; as tabelas de estado, registros imutáveis, diário e requisições mantiveram as mesmas contagens do backup anterior.
+
+## Adendo — atualização 1.3.2 (28/10/2026)
+
+A 1.3.2 foi publicada pelo workflow e virou o release mais recente com os três arquivos necessários. A instalação local 1.3.1 detectou “Versão 1.3.2 disponível”, baixou a atualização até o estado “pronta” e solicitou a instalação. A nova versão foi encontrada no diretório instalado; depois de reabrir, o app informou versão 1.3.2 e “O Caderno está atualizado”. O banco do perfil real permaneceu íntegro, com 1 estado, 11 registros imutáveis, 122 eventos no diário e 3 requisições, iguais ao backup anterior. O teste do fluxo usou um perfil isolado para não criar atividades ou respostas no histórico real.
