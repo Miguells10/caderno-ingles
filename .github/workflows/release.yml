@@ -30,7 +30,15 @@ jobs:
         run: npm test
       - name: Compilar aplicativo
         run: npm run build
-      - name: Gerar e publicar atualização Windows
-        run: npx electron-builder --win nsis --x64 --publish always
+      - name: Gerar atualização Windows
+        run: npx electron-builder --win nsis --x64 --publish never
+      - name: Publicar arquivos juntos
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $assets = @(Get-ChildItem release -File | Where-Object { $_.Name -eq 'latest.yml' -or $_.Name -like "Caderno-Ingles-Setup-$version.exe*" } | ForEach-Object { $_.FullName })
+          if ($assets.Count -lt 2) { throw 'Instalador ou manifesto não encontrado.' }
+          gh release create $env:GITHUB_REF_NAME $assets --title $version --notes "Atualização do Caderno de Inglês $version." --repo Miguells10/caderno-ingles
+          if ($LASTEXITCODE -ne 0) { throw 'Falha ao publicar release.' }
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

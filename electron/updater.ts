@@ -43,6 +43,7 @@ export function createUpdater(publish: (status: UpdateStatus) => void) {
       const accessToken = await token();
       if (!accessToken) return emit({ phase: 'login_required', message: 'Entre no GitHub neste computador para verificar atualizações privadas.' });
       process.env.GH_TOKEN = accessToken;
+      autoUpdater.setFeedURL({ provider: 'github', owner: 'Miguells10', repo: 'caderno-ingles', private: true });
       emit({ phase: 'checking', message: 'Procurando atualização…' });
       try {
         await autoUpdater.checkForUpdates();

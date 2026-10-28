@@ -4,7 +4,7 @@ Aplicativo pessoal de estudos para Windows, feito com Electron, React, TypeScrip
 
 ## Usar no Windows
 
-Instale `release/Caderno-Ingles-Setup-1.3.0.exe` uma vez. A localização dos dados aparece em Ajustes. A versão 1.3.0 acrescenta verificação de atualizações privadas; versões antigas e a edição portátil não conseguem se atualizar sozinhas.
+Instale o arquivo `Caderno-Ingles-Setup-<versão>.exe` uma vez. A localização dos dados aparece em Ajustes. A partir da versão 1.3.1, o app verifica atualizações privadas; versões antigas e a edição portátil precisam de instalação manual.
 
 A versão 1.2.0 acrescentou exportação do planejamento inteiro ou de uma aula em JSON e Markdown, com evidências registradas e reimportação sem duplicatas. O histórico v1 continua aceito.
 
@@ -37,9 +37,9 @@ O projeto está em `C:\Users\Miguel Lucas\Documents\Estudos\caderno-ingles`. O e
 
 ## Atualizações do aplicativo
 
-A versão instalada 1.3.0 procura uma atualização ao abrir e oferece **Baixar** e **Reiniciar e atualizar**. Também há **Verificar atualizações** em Ajustes. O aplicativo lê a autenticação privada do GitHub CLI neste computador; nenhum token entra no código ou no instalador. Sem login, o app mostra essa necessidade em Ajustes. A pasta portátil não se atualiza automaticamente.
+A versão instalada procura uma atualização ao abrir e oferece **Baixar** e **Reiniciar e atualizar**. Também há **Verificar atualizações** em Ajustes. O aplicativo lê a autenticação privada do GitHub CLI neste computador; nenhum token entra no código ou no instalador. Sem login, o app mostra essa necessidade em Ajustes. A pasta portátil não se atualiza automaticamente.
 
-Para publicar uma nova versão, primeiro atualize `version` em `package.json` e `package-lock.json`, confirme testes e crie/envie uma tag `v<versão>` no repositório privado. O workflow `Publicar atualização do Caderno` gera o instalador NSIS e o arquivo `latest.yml` em GitHub Releases. A instalação inicial da 1.3.0 ainda é manual. O fluxo completo entre uma versão instalada e uma versão remota nova precisa ser testado após a criação do repositório e do primeiro release.
+Para publicar uma nova versão, primeiro atualize `version` em `package.json` e `package-lock.json`, confirme testes e crie/envie uma tag `v<versão>` no repositório privado. O workflow `Publicar atualização do Caderno` gera o instalador NSIS e o arquivo `latest.yml` no mesmo GitHub Release. A instalação inicial ainda é manual.
 
 O [relatório de atualizações](RELATORIO-ATUALIZACOES.md) reúne o contexto técnico, as verificações e as pendências para revisão.
 
