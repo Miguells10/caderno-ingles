@@ -1,0 +1,89 @@
+{
+  "name": "caderno-ingles",
+  "version": "1.3.0",
+  "private": true,
+  "description": "Seu caderno pessoal de inglês, conectado ao tutor.",
+  "author": "Miguel Lucas",
+  "license": "UNLICENSED",
+  "type": "module",
+  "main": "dist-electron/main.cjs",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "tsc --noEmit && vite build && node scripts/build-electron.mjs",
+    "test": "tsx --test tests/*.test.ts",
+    "package:win": "npm run build && electron-builder --win nsis portable --x64 --publish never",
+    "package:update": "npm run build && electron-builder --win nsis --x64 --publish never",
+    "start": "electron ."
+  },
+  "dependencies": {
+    "@fontsource/dm-sans": "^5.2.0",
+    "@fontsource/lora": "^5.2.0",
+    "@modelcontextprotocol/sdk": "^1.25.0",
+    "electron-updater": "^6.8.11",
+    "gray-matter": "^4.0.3",
+    "lucide-react": "^0.468.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-markdown": "^10.1.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "electron": "^44.0.0",
+    "electron-builder": "^26.0.0",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vite": "^6.4.0"
+  },
+  "build": {
+    "appId": "br.com.miguel.caderno",
+    "productName": "Caderno Ingles",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "npmRebuild": false,
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Miguells10",
+        "repo": "caderno-ingles",
+        "private": true,
+        "releaseType": "release"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Caderno - Ingles",
+      "runAfterFinish": false,
+      "deleteAppDataOnUninstall": false
+    },
+    "portable": {
+      "artifactName": "Caderno-Ingles-Portable-${version}.exe"
+    },
+    "artifactName": "Caderno-Ingles-Setup-${version}.exe"
+  }
+}

@@ -1,0 +1,23 @@
+name: Verificar Caderno
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verificar:
+    runs-on: windows-latest
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Verificar regras de dados
+        run: npm test
+      - name: Compilar aplicativo
+        run: npm run build
