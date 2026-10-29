@@ -1,10 +1,12 @@
 # Caderno · Inglês
 
+**Código visível com direitos reservados.** Copyright (c) 2026 Miguel Lucas. Este repositório não oferece licença de uso, modificação ou redistribuição. Consulte [COPYRIGHT.md](COPYRIGHT.md).
+
 Aplicativo pessoal de estudos para Windows, feito com Electron, React, TypeScript e SQLite. Guarda aulas, materiais, tentativas escritas, correções, reutilizações e flashcards no computador. Áudio e conversação acontecem fora do app.
 
 ## Usar no Windows
 
-Instale o arquivo `Caderno-Ingles-Setup-<versão>.exe` uma vez. A localização dos dados aparece em Ajustes. A partir da versão 1.3.1, o app verifica atualizações privadas; versões antigas e a edição portátil precisam de instalação manual.
+Instale o arquivo `Caderno-Ingles-Setup-<versão>.exe` uma vez. A localização dos dados aparece em Ajustes. A partir da versão 1.3.1, o app verifica atualizações pelo fluxo criado para o repositório privado; versões antigas e a edição portátil precisam de instalação manual.
 
 A versão 1.2.0 acrescentou exportação do planejamento inteiro ou de uma aula em JSON e Markdown, com evidências registradas e reimportação sem duplicatas. O histórico v1 continua aceito.
 
@@ -35,13 +37,13 @@ Backup completo e restauração ficam em Ajustes. A restauração pede confirma�
 
 ## GitHub
 
-O projeto está em `C:\Users\Miguel Lucas\Documents\Estudos\caderno-ingles`. O endereço `origin` aponta para o repositório privado `Miguells10/caderno-ingles`. O login do GitHub CLI pertence ao computador, não à pasta. A ação `Verificar Caderno` executa testes e build em cada envio e pull request. Dados locais, backups e instaladores estão excluídos do Git.
+O projeto está em `C:\Users\Miguel Lucas\Documents\Estudos\caderno-ingles`. O endereço `origin` aponta para o repositório público `Miguells10/caderno-ingles`. A visibilidade pública não concede licença de reutilização; consulte [COPYRIGHT.md](COPYRIGHT.md). A ação `Verificar Caderno` executa testes e build em cada envio e pull request. Dados locais, backups e instaladores estão excluídos do Git.
 
 ## Atualizações do aplicativo
 
-A versão instalada procura uma atualização ao abrir e oferece **Baixar** e **Reiniciar e atualizar**. Também há **Verificar atualizações** em Ajustes. O aplicativo lê a autenticação privada do GitHub CLI neste computador; nenhum token entra no código ou no instalador. Sem login, o app mostra essa necessidade em Ajustes. A pasta portátil não se atualiza automaticamente.
+A versão instalada procura uma atualização ao abrir e oferece **Baixar** e **Reiniciar e atualizar**. Também há **Verificar atualizações** em Ajustes. A versão 1.3.4 ainda usa o provedor privado e a autenticação do GitHub CLI; após a mudança do repositório para público, esse fluxo precisa ser adaptado e novamente verificado antes de prometer atualizações automáticas. Nenhum token entra no código ou no instalador. A pasta portátil não se atualiza automaticamente.
 
-Para publicar uma nova versão, primeiro atualize `version` em `package.json` e `package-lock.json`, confirme testes e crie/envie uma tag `v<versão>` no repositório privado. O workflow `Publicar atualização do Caderno` gera o instalador NSIS e o arquivo `latest.yml` no mesmo GitHub Release. A instalação inicial ainda é manual.
+Para publicar uma nova versão, primeiro atualize `version` em `package.json` e `package-lock.json`, confirme testes e crie/envie uma tag `v<versão>` no repositório. O workflow `Publicar atualização do Caderno` gera o instalador NSIS e o arquivo `latest.yml` no mesmo GitHub Release. A instalação inicial ainda é manual.
 
 O [relatório de atualizações](RELATORIO-ATUALIZACOES.md) reúne o contexto técnico, as verificações e as pendências para revisão.
 
