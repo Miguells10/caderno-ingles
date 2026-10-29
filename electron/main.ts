@@ -67,7 +67,8 @@ if (process.argv.includes('--mcp')) {
             const selected = await dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: 'Intercâmbio do Caderno', extensions: ['md', 'json'] }], title: 'Importar contexto do Caderno' });
             if (selected.canceled || !selected.filePaths[0]) return { canceled: true };
             const result = await importExchange(selected.filePaths[0], store);
-            return { message: `Importação concluída: ${result.added} itens novos, ${result.unchanged} já existentes.` };
+            if (result.added) for (const window of BrowserWindow.getAllWindows()) window.webContents.send('caderno:changed');
+            return { message: `Importação concluída: ${result.added} itens novos, ${result.unchanged} já existentes. Veja as aulas em Aulas → Lista; no calendário, confira o mês agendado.` };
           }
           case 'backup': {
             const selected = await dialog.showSaveDialog({ defaultPath: join(app.getPath('documents'), 'Caderno-Ingles-backup.json'), filters: [{ name: 'Backup completo', extensions: ['json'] }] });
