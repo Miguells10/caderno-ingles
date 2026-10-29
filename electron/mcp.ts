@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { app } from 'electron';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
@@ -19,7 +20,7 @@ function register(server: McpServer, name: string, description: string, inputSch
 
 /** Start the local stdio MCP server. Electron's --mcp mode calls server.connect(transport). */
 export async function startMcpServer(store: StudyStore): Promise<{ server: McpServer; transport: StdioServerTransport }> {
-  const server = new McpServer({ name: 'caderno-ingles', version: '1.1.1' });
+  const server = new McpServer({ name: 'caderno-ingles', version: app.getVersion() });
   const transport = new StdioServerTransport();
   const requestId = (value: unknown) => typeof value === 'string' && value.trim() ? value.trim() : randomUUID();
 
@@ -77,10 +78,10 @@ export async function startMcpServer(store: StudyStore): Promise<{ server: McpSe
     return store.execute({ type: 'submitAttempt', ...attempt, source: 'chat', requestId: requestId(req) }).attempts.at(-1);
   });
 
-  register(server, 'add_tutor_feedback', 'Acrescente uma pista ou correção como registro imutável. Use correctedText, reusePrompt e result quando houver correção.', {
-    attemptId: z.string().min(1).max(128), kind: z.enum(['hint', 'correction']), text: z.string().min(1).max(200_000), correctedText: z.string().max(200_000).default(''), reusePrompt: z.string().max(200_000).default(''), result: z.enum(['correct', 'needs_work', 'ungraded']).default('ungraded'), targetChunk: z.string().max(500).optional(), contextSeeds: z.array(z.string().min(1).max(500)).max(2).optional(), suggestedErrorType: z.enum(['l1_transfer', 'collocation', 'preposition', 'verb_form', 'other']).nullable().optional(), requestId: z.string().max(200).optional(),
+  register(server, 'add_tutor_feedback', 'Acrescente pista ou correção imutável. Na correção, explique brevemente a regra em ruleExplanation quando a pista não bastar; preserve a tentativa inicial e proponha reutilização.', {
+    attemptId: z.string().min(1).max(128), kind: z.enum(['hint', 'correction']), text: z.string().min(1).max(200_000), correctedText: z.string().max(200_000).default(''), reusePrompt: z.string().max(200_000).default(''), result: z.enum(['correct', 'needs_work', 'ungraded']).default('ungraded'), targetChunk: z.string().max(500).optional(), contextSeeds: z.array(z.string().min(1).max(500)).max(2).optional(), suggestedErrorType: z.enum(['l1_transfer', 'collocation', 'preposition', 'verb_form', 'other']).nullable().optional(), ruleExplanation: z.string().max(5000).optional(), requestId: z.string().max(200).optional(),
   }, args => {
-    const { requestId: req, ...feedback } = args as {attemptId:string;kind:'hint'|'correction';text:string;correctedText:string;reusePrompt:string;result:'correct'|'needs_work'|'ungraded';targetChunk?:string;contextSeeds?:string[];suggestedErrorType?:ErrorType|null;requestId?:string};
+    const { requestId: req, ...feedback } = args as {attemptId:string;kind:'hint'|'correction';text:string;correctedText:string;reusePrompt:string;result:'correct'|'needs_work'|'ungraded';targetChunk?:string;contextSeeds?:string[];suggestedErrorType?:ErrorType|null;ruleExplanation?:string;requestId?:string};
     return store.execute({ type: 'addFeedback', feedback, requestId: requestId(req) }).feedback.at(-1);
   });
 

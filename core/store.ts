@@ -38,7 +38,7 @@ const feedbackSchema = entitySchema({
   attemptId: id, kind: z.enum(['hint', 'correction']), text: requiredText,
   correctedText: text, reusePrompt: text, result: z.enum(['correct', 'needs_work', 'ungraded']),
   targetChunk: z.string().max(500).optional(), contextSeeds: z.array(z.string().trim().min(1).max(500)).max(2).optional(),
-  suggestedErrorType: errorType.nullable().optional(),
+  suggestedErrorType: errorType.nullable().optional(), ruleExplanation: z.string().max(5000).optional(),
 });
 const completionSchema = entitySchema({
   activityId: id, mode: z.enum(['full', 'minimum', 'external']), minutes: z.number().int().min(1).max(1_440).nullable(),
@@ -148,6 +148,7 @@ export function validateState(data: unknown): StudyState {
     if (!attemptIds.has(feedback.attemptId)) throw new Error('O feedback referencia uma resposta inexistente.');
     if (feedback.kind === 'hint' && feedback.result !== 'ungraded') throw new Error('Uma pista ainda não é uma avaliação.');
     if (feedback.kind === 'hint' && feedback.suggestedErrorType) throw new Error('Uma pista não classifica erros.');
+    if (feedback.kind === 'hint' && feedback.ruleExplanation?.trim()) throw new Error('A explicação da regra acompanha uma correção.');
   }
   for (const feedbackId of Object.keys(state.feedbackErrorTypes)) {
     if (!state.feedback.some(item => item.id === feedbackId && item.kind === 'correction')) throw new Error('A categoria referencia uma correção inexistente.');
@@ -181,7 +182,7 @@ function fingerprint(value: unknown): string {
 function metadata(current: Entity | undefined, input: Partial<Entity>, now: string): Entity {
   if (current) {
     if (input.revision !== current.revision) throw new Error('Este item foi atualizado em outra janela. Recarregue antes de salvar.');
-    return { id: current.id, revision: current.revision + 1, createdAt: current.createdAt, updatedAt: now };
+    return { id: current.id, revision: current.revision + 1, createdAt: current.createdAt, updatedAt: Date.parse(now) < Date.parse(current.createdAt) ? current.createdAt : now };
   }
   if (input.revision !== undefined && input.revision !== 1) throw new Error('Um novo item deve começar na revisão 1.');
   return { id: input.id ?? randomUUID(), revision: 1, createdAt: now, updatedAt: now };
@@ -205,7 +206,7 @@ const allowedEntityKeys: Record<'saveLesson' | 'saveMaterial' | 'saveCard' | 'ad
   saveLesson: [...Object.keys(base), 'title', 'objective', 'scheduledDate', 'minutes', 'tags', 'materialIds', 'archived'],
   saveMaterial: [...Object.keys(base), 'title', 'type', 'url', 'content', 'tags', 'attachmentName', 'attachmentId'],
   saveCard: [...Object.keys(base), 'front', 'back', 'tags', 'sourceActivityId', 'sourceText', 'dueDate', 'intervalIndex', 'archived', 'targetChunk'],
-  addFeedback: [...Object.keys(base), 'attemptId', 'kind', 'text', 'correctedText', 'reusePrompt', 'result', 'targetChunk', 'contextSeeds', 'suggestedErrorType'],
+  addFeedback: [...Object.keys(base), 'attemptId', 'kind', 'text', 'correctedText', 'reusePrompt', 'result', 'targetChunk', 'contextSeeds', 'suggestedErrorType', 'ruleExplanation'],
 };
 
 function applyCommand(state: StudyState, command: Command, now: string): void {
@@ -291,7 +292,8 @@ function applyCommand(state: StudyState, command: Command, now: string): void {
       if (command.feedback.kind === 'hint' && (
         Boolean(command.feedback.targetChunk?.trim()) ||
         Boolean(command.feedback.contextSeeds?.length) ||
-        Boolean(command.feedback.suggestedErrorType)
+        Boolean(command.feedback.suggestedErrorType) ||
+        Boolean(command.feedback.ruleExplanation?.trim())
       )) throw new Error('Expressões alvo, situações e categorias só podem acompanhar uma correção.');
       const feedback: Feedback = {
         correctedText: '', reusePrompt: '', result: 'ungraded', ...command.feedback, ...metadata(undefined, command.feedback, now),

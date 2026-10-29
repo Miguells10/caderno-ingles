@@ -146,6 +146,7 @@ if (process.argv.includes('--mcp')) {
                   lines.push(`\nResposta (${attempt.stage}; ${attempt.source}):\n${attempt.text}`);
                   for (const feedback of state.feedback.filter(item => item.attemptId === attempt.id)) {
                     lines.push(`Retorno do tutor (${feedback.kind}${feedback.result !== 'ungraded' ? `; ${feedback.result}` : ''}):\n${feedback.text}`);
+                    if (feedback.ruleExplanation) lines.push(`Por que essa forma funciona: ${feedback.ruleExplanation}`);
                     if (feedback.correctedText) lines.push(`Versão corrigida: ${feedback.correctedText}`);
                     if (feedback.reusePrompt) lines.push(`Pedido de reutilização: ${feedback.reusePrompt}`);
                     if (feedback.targetChunk) lines.push(`Expressão alvo: ${feedback.targetChunk}`);
@@ -167,7 +168,7 @@ if (process.argv.includes('--mcp')) {
               lines.push('\n## Práticas avulsas fora do app');
               for (const log of state.externalLogs.slice(-10)) lines.push(`- ${log.loggedAt}: ${log.modality}; ${log.minutes ?? 'tempo não informado'} min${log.chunkApplied ? `; expressão: ${log.chunkApplied}` : ''}`);
             }
-            lines.push('\n## Como continuar\nContinue da etapa atual indicada. Conduza uma etapa por vez: peça minha produção antes da solução, dê até três correções importantes, ofereça uma pista de autocorreção e peça que eu reutilize o aprendizado. Aguarde minha tentativa e confirmação antes de considerar a prática concluída. Listening e speaking acontecem fora do app; não infira que foram feitos por uma resposta escrita.');
+            lines.push('\n## Como continuar\nContinue da etapa atual indicada. Conduza uma etapa por vez em um cenário com objetivo e destinatário claros. Peça minha produção antes da solução; corrija no máximo três pontos. Dê uma pista concreta para autocorreção e, se eu não entender, se o erro for estrutural ou se eu pedir, explique a regra diretamente e registre uma explicação curta em ruleExplanation. Mostre uma forma natural e peça reutilização em outro contexto. Aguarde minha tentativa e confirmação antes de considerar a prática concluída. Listening e speaking acontecem fora do app; não infira que foram feitos por uma resposta escrita.');
             clipboard.writeText(lines.join('\n'));
             return { message: 'Contexto para o tutor copiado.' };
           }

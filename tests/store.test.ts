@@ -7,6 +7,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { addLocalDays, getDueCards, getStudyMetrics, getWarmupCard, localDate } from '../core/metrics.js';
 import { exportExchange, exportMarkdown, importExchange, importMarkdown, restoreBackup } from '../electron/exchange.js';
 import { createEmptyState, StudyStore, validateState } from '../core/store.js';
+import { starterState } from '../electron/seed.js';
 import type { Command, StudyState } from '../shared/types.js';
 
 function fixture(t: { after: (fn: () => void) => void }, seed?: StudyState) {
@@ -373,17 +374,35 @@ test('external quick log is append-only, idempotent and separate from lesson com
   assert.equal(getStudyMetrics(repeated).attemptAccuracy, null);
 });
 
-test('feedback seeds and suggested error can be accepted without editing original feedback', t => {
-  const { store } = fixture(t);
+test('feedback explanation, seeds and suggested error preserve the original and survive exchange', async t => {
+  const { store, directory } = fixture(t);
   lesson(store);
   const attempt = initial(store).attempts[0];
   const state = store.execute({ type: 'addFeedback', feedback: {
     attemptId: attempt.id, kind: 'correction', text: 'Use creating.', targetChunk: 'responsible for creating',
     contextSeeds: ['Describe a form bug', 'Explain a slow query'], suggestedErrorType: 'verb_form',
+    ruleExplanation: 'After responsible for, use a verb ending in -ing.',
   } });
   const original = state.feedback[0];
   const tagged = store.execute({ type: 'setFeedbackErrorType', feedbackId: original.id, errorType: 'verb_form' });
   assert.deepEqual(tagged.feedback[0], original);
   assert.equal(tagged.feedbackErrorTypes[original.id], 'verb_form');
+  const exported = join(directory, 'explanation.md');
+  await exportExchange(tagged, exported, 'md');
+  assert.match(readFileSync(exported, 'utf8'), /After responsible for, use a verb ending in -ing/);
+  const copy = fixture(t).store;
+  await importExchange(exported, copy);
+  assert.equal(copy.getState().feedback[0].ruleExplanation, original.ruleExplanation);
+  assert.throws(() => store.execute({ type: 'addFeedback', feedback: { attemptId: attempt.id, kind: 'hint', text: 'Try again.', ruleExplanation: 'Use -ing.' } }), /explicação da regra|só podem acompanhar uma correção/i);
   assert.throws(() => store.execute({ type: 'addFeedback', feedback: { attemptId: attempt.id, kind: 'correction', text: 'Too many seeds', contextSeeds: ['a', 'b', 'c'] } }), /contextSeeds/);
+});
+
+test('a future scheduled starter lesson can be edited before its scheduled day', t => {
+  const { store } = fixture(t, starterState());
+  const lesson = store.getState().lessons.find(item => item.id === 'lesson-20261030')!;
+  const updated = store.execute({ type: 'saveLesson', lesson: { ...lesson, title: 'Technical project update' } });
+  const after = updated.lessons.find(item => item.id === lesson.id)!;
+  assert.equal(after.title, 'Technical project update');
+  assert.equal(after.createdAt, lesson.createdAt);
+  assert.ok(Date.parse(after.updatedAt) >= Date.parse(after.createdAt));
 });

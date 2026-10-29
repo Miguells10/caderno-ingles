@@ -25,3 +25,15 @@ export function ErrorPatterns() {
     })}</div> : <p className="muted">Quando você confirmar uma categoria em uma correção, ela aparecerá aqui com a frase original.</p>}
   </section>;
 }
+
+export function TutorInsights() {
+  const { state } = useStudy();
+  const explanations = state.feedback.filter(item => item.kind === 'correction' && (item.ruleExplanation?.trim() || item.targetChunk?.trim()));
+  return <section className="writing-evidence"><div className="section-title"><div><h2>Regras e expressões trabalhadas</h2><p className="muted">Orientações registradas pelo tutor. Estar nesta lista ainda não significa domínio.</p></div></div>
+    {explanations.length ? <div className="error-pattern-list">{[...explanations].reverse().slice(0, 20).map(item => {
+      const attempt = state.attempts.find(answer => answer.id === item.attemptId);
+      const activity = state.activities.find(task => task.id === attempt?.activityId);
+      return <div className="error-example" key={item.id}><span className="eyebrow">{dateLabel(item.createdAt, true)}{activity ? ` · ${activity.title}` : ''}</span>{item.targetChunk && <p lang="en"><strong>Expressão:</strong> {item.targetChunk}</p>}{item.ruleExplanation && <p><strong>Por quê:</strong> {item.ruleExplanation}</p>}</div>;
+    })}</div> : <p className="muted">Quando o tutor registrar uma explicação ou expressão alvo, ela aparecerá aqui.</p>}
+  </section>;
+}

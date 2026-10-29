@@ -64,7 +64,7 @@ function report(state: StudyState) {
             feedback: state.feedback.filter(item => attemptIds.has(item.attemptId)).map(item => ({
               id: item.id, at: item.createdAt, attemptId: item.attemptId, kind: item.kind, text: item.text,
               correctedText: item.correctedText, reusePrompt: item.reusePrompt, result: item.result,
-              targetChunk: item.targetChunk ?? '', contextSeeds: item.contextSeeds ?? [],
+              targetChunk: item.targetChunk ?? '', contextSeeds: item.contextSeeds ?? [], ruleExplanation: item.ruleExplanation ?? '',
               suggestedErrorType: item.suggestedErrorType ?? null, acceptedErrorType: state.feedbackErrorTypes[item.id] ?? null,
             })),
             cards: state.cards.filter(item => item.sourceActivityId === activity.id).map(item => ({
@@ -110,7 +110,7 @@ function reportMarkdown(data: ReturnType<typeof report>): string {
       if (activity.criteria) lines.push(`Critérios: ${activity.criteria}`);
       lines.push(activity.completion ? `Confirmada em ${activity.completion.confirmedAt}; tempo real: ${activity.completion.actualMinutes ?? 'não informado'} min; ${activity.completion.notes}` : 'Ainda sem conclusão confirmada.');
       for (const attempt of activity.attempts) lines.push(`Resposta ${attempt.stage} em ${attempt.at}: ${attempt.text}`);
-      for (const feedback of activity.feedback) lines.push(`Retorno ${feedback.kind} (${feedback.result}) para ${feedback.attemptId}: ${feedback.text}${feedback.correctedText ? ` | Versão corrigida: ${feedback.correctedText}` : ''}${feedback.reusePrompt ? ` | Reutilização proposta: ${feedback.reusePrompt}` : ''}${feedback.targetChunk ? ` | Expressão alvo: ${feedback.targetChunk}` : ''}${feedback.contextSeeds.length ? ` | Situações opcionais: ${feedback.contextSeeds.join('; ')}` : ''}${feedback.acceptedErrorType ? ` | Categoria confirmada: ${feedback.acceptedErrorType}` : ''}`);
+      for (const feedback of activity.feedback) lines.push(`Retorno ${feedback.kind} (${feedback.result}) para ${feedback.attemptId}: ${feedback.text}${feedback.ruleExplanation ? ` | Por quê: ${feedback.ruleExplanation}` : ''}${feedback.correctedText ? ` | Versão corrigida: ${feedback.correctedText}` : ''}${feedback.reusePrompt ? ` | Reutilização proposta: ${feedback.reusePrompt}` : ''}${feedback.targetChunk ? ` | Expressão alvo: ${feedback.targetChunk}` : ''}${feedback.contextSeeds.length ? ` | Situações opcionais: ${feedback.contextSeeds.join('; ')}` : ''}${feedback.acceptedErrorType ? ` | Categoria confirmada: ${feedback.acceptedErrorType}` : ''}`);
       for (const card of activity.cards) lines.push(`Cartão: ${card.front} → ${card.back}; revisões: ${card.reviews.length}${card.reviews.length ? ` (${card.reviews.map(review => `${review.reviewedAt}: ${review.rating}${review.usedHint ? ' com pista' : ' sem pista'}`).join('; ')})` : ''}`);
     }
   }

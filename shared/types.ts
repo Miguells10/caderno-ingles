@@ -18,6 +18,7 @@ export type Feedback = Entity & {
  attemptId: string; kind: 'hint' | 'correction'; text: string;
  correctedText: string; reusePrompt: string; result: 'correct' | 'needs_work' | 'ungraded';
  targetChunk?: string; contextSeeds?: string[]; suggestedErrorType?: ErrorType | null;
+ ruleExplanation?: string;
 };
 export type Completion = Entity & {
  activityId: string; mode: 'full' | 'minimum' | 'external';
